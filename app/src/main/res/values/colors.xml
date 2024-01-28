@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="myPrimary">#00897B</color>
+
+
+    <color name="mySecondary">#D3D5D7</color>
+    <color name="neutralGray">#808080</color>
+
+    <color name="toolbarColor">#003A9F</color>
+
+</resources>
