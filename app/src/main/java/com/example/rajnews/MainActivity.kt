@@ -16,6 +16,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.kwabenaberko.newsapilib.NewsApiClient
 import com.kwabenaberko.newsapilib.NewsApiClient.ArticlesResponseCallback
 import com.kwabenaberko.newsapilib.models.Article
+import com.kwabenaberko.newsapilib.models.request.EverythingRequest
 import com.kwabenaberko.newsapilib.models.request.TopHeadlinesRequest
 import com.kwabenaberko.newsapilib.models.response.ArticleResponse
 
@@ -26,7 +27,7 @@ class MainActivity : AppCompatActivity()  {
     private var binding : ActivityMainBinding? = null
     private  var articleList : MutableList<Article>? = null
     private lateinit var newsAdapter: NewsAdapter
-
+    val newsApiClient = NewsApiClient("6d007d61802c4d708d62be0bd8f1f418")
     private val tabTitles = listOf("general", "india", "sports","entertainment", "health", "science","business", "technology")
 
 
@@ -47,6 +48,8 @@ class MainActivity : AppCompatActivity()  {
         newsAdapter = NewsAdapter(articleList!!)
         binding!!.rvArticles.adapter = newsAdapter
         navigationView()
+
+
 
     }
 
@@ -128,11 +131,37 @@ class MainActivity : AppCompatActivity()  {
         })
     }
 
+    private fun getEveryThing(query : String? ){
+        newsApiClient.getEverything(
+            EverythingRequest.Builder()
+                .q(query)
+                .language("en")
+                .sortBy("publishedAt")
+                .build(),
+            object : ArticlesResponseCallback {
+                override fun onSuccess(response: ArticleResponse) {
+                   var article = response.articles
+                    for (i in article){
+                        runOnUiThread {
+                            setUpProgressBAr(false)
+                            articleList = response.articles
+                            newsAdapter.updateData(articleList!!)
+                            newsAdapter.notifyDataSetChanged()
+                        }
+                    }
+                }
+
+                override fun onFailure(throwable: Throwable) {
+                    Log.i("error" , throwable.toString())
+                }
+            }
+        )
+    }
     fun getNews(country: String?, category: String? , query : String?){
 
         //Here we are getting full News
         setUpProgressBAr(true)
-        val newsApiClient = NewsApiClient("6d007d61802c4d708d62be0bd8f1f418")
+
         newsApiClient.getTopHeadlines(
             TopHeadlinesRequest.Builder()
                 .language("en")
@@ -169,7 +198,7 @@ class MainActivity : AppCompatActivity()  {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-               getNews(null , null ,query)
+              getEveryThing(query)
                 return true
             }
 
@@ -179,6 +208,11 @@ class MainActivity : AppCompatActivity()  {
         })
 
         return true
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+
     }
 
  }
